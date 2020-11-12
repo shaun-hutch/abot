@@ -174,7 +174,9 @@ namespace Abot2.Tests.Unit.Core
                 var crawledPage = new CrawledPage(new System.Uri("https://www.test.com"));
                 crawledPage.Content = result;
 
-                metaUrl = _uut.GetMetaRedirectUrl(crawledPage);
+                
+
+                metaUrl = crawledPage.RedirectedTo.Uri.ToString();
             }
 
             MakeCommonAssertions(result, JapaneseCharset);
@@ -200,7 +202,7 @@ namespace Abot2.Tests.Unit.Core
                 var crawledPage = new CrawledPage(new System.Uri("https://www.test.com"));
                 crawledPage.Content = result;
 
-                metaUrl = _uut.GetMetaRedirectUrl(crawledPage);
+                metaUrl = crawledPage.RedirectedTo.Uri.ToString();
             }
 
             MakeCommonAssertions(result, JapaneseCharset);
@@ -225,7 +227,7 @@ namespace Abot2.Tests.Unit.Core
                 var crawledPage = new CrawledPage(new System.Uri("https://www.test.com"));
                 crawledPage.Content = result;
 
-                metaUrl = _uut.GetMetaRedirectUrl(crawledPage);
+                metaUrl = crawledPage.RedirectedTo.Uri.ToString();
             }
 
             MakeCommonAssertions(result, null);
@@ -251,7 +253,7 @@ namespace Abot2.Tests.Unit.Core
                 var crawledPage = new CrawledPage(new System.Uri("https://www.test.com"));
                 crawledPage.Content = result;
 
-                metaUrl = _uut.GetMetaRedirectUrl(crawledPage);
+                metaUrl = crawledPage.RedirectedTo.Uri.ToString();
             }
 
             MakeCommonAssertions(result, JapaneseCharset);

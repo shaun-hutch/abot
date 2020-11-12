@@ -15,7 +15,6 @@ namespace Abot2.Core
     {
         Task<PageContent> GetContentAsync(HttpResponseMessage response);
 
-        string GetMetaRedirectUrl(CrawledPage page);
     }
 
     public class WebContentExtractor : IWebContentExtractor
@@ -38,32 +37,6 @@ namespace Abot2.Core
             }
 
             return pageContent;
-        }
-
-        public virtual string GetMetaRedirectUrl(CrawledPage crawledPage)
-        {
-            var metaMatch = crawledPage.AngleSharpHtmlDocument
-                .QuerySelectorAll("meta[http-equiv]")
-                .FirstOrDefault(d => d.GetAttribute("http-equiv").ToLowerInvariant() == "refresh");
-
-            if (metaMatch == null)
-                return "";
-
-            var content = metaMatch.GetAttribute("content");
-            var contentMatches = Regex.Matches(content, @".*?url\s*=\s*([^""';]+)", RegexOptions.IgnoreCase);
-
-            string metaUrl = null;
-            if (contentMatches.Count == 0)
-                return "";
-
-            if (contentMatches[0].Groups.Count > 1)
-                metaUrl = contentMatches[0].Groups[1].Value;
-
-            //append http or https to the url
-            if (!metaUrl.Contains(crawledPage.Uri.Scheme))
-                metaUrl = $"{crawledPage.Uri.Scheme}://{crawledPage.Uri.Host}/{metaUrl.TrimStart('/')}";
-
-            return metaUrl;
         }
 
         protected virtual string GetCharset(HttpContentHeaders headers, string body)

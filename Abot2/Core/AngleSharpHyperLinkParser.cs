@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AngleSharp.Dom;
 using System.Text.RegularExpressions;
+using AngleSharp;
 
 namespace Abot2.Core
 {
@@ -58,7 +59,6 @@ namespace Abot2.Core
             return baseTagValue.Value.Trim();
         }
 
-
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
             var robotsMeta = crawledPage.AngleSharpHtmlDocument
@@ -69,6 +69,31 @@ namespace Abot2.Core
                 return "";
 
             return robotsMeta.GetAttribute("content");
+        }
+        protected override HyperLink GetMetaRedirectHyperLink(CrawledPage crawledPage)
+        {
+            var metaMatch = crawledPage.AngleSharpHtmlDocument
+                .QuerySelectorAll("meta[http-equiv]")
+                .FirstOrDefault(d => d.GetAttribute("http-equiv").ToLowerInvariant() == "refresh");
+
+            if (metaMatch == null)
+                return null;
+
+            var content = metaMatch.GetAttribute("content");
+            var contentMatches = Regex.Matches(content, @".*?url\s*=\s*([^""';]+)", RegexOptions.IgnoreCase);
+
+            string metaUrl = null;
+            if (contentMatches.Count == 0)
+                return null;
+
+            if (contentMatches[0].Groups.Count > 1)
+                metaUrl = contentMatches[0].Groups[1].Value;
+
+            //append http or https to the url
+            if (!metaUrl.Contains(crawledPage.Uri.Scheme))
+                metaUrl = $"{crawledPage.Uri.Scheme}://{crawledPage.Uri.Host}/{metaUrl.TrimStart('/')}";
+
+            return new HyperLink() { HrefValue = new Uri(metaUrl) };
         }
 
         protected virtual bool HasRelCanonicalPointingToDifferentUrl(IElement e, string orginalUrl)
@@ -83,5 +108,7 @@ namespace Abot2.Core
         {
             return Config.IsRespectAnchorRelNoFollowEnabled && (e.HasAttribute("rel") && e.GetAttribute("rel").ToLower().Trim() == "nofollow");
         }
+
+        
     }
 }

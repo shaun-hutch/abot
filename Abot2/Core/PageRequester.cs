@@ -109,8 +109,6 @@ namespace Abot2.Core
                         {
                             crawledPage.DownloadContentStarted = DateTime.Now;
                             crawledPage.Content = await _contentExtractor.GetContentAsync(response).ConfigureAwait(false);
-                            if (_config.IsFollowMetaRedirectsEnabled)
-                                crawledPage.MetaRedirectURL = _contentExtractor.GetMetaRedirectUrl(crawledPage);
                             crawledPage.DownloadContentCompleted = DateTime.Now;
                         }
                         else
